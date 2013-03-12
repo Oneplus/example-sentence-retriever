@@ -27,10 +27,21 @@ class QuickFind(QDialog):
         # Connect up the buttons.
         self.ui.queryButton.clicked.connect(self.query)
 
+    def _template(self, keyword, sent, words):
+        html = "<li>"
+
+        for word, tag in words:
+            if keyword == word:
+                html += "<strong>%s</strong>(%s) " % (word, tag)
+            else:
+                html += "%s(%s) " % (word, tag)
+        html += "</li>"
+        return html
+
     def query(self):
 
         keyword = self.ui.queryBox.toPlainText()
-        keyword = unicode(keyword).encode("gb18030").strip()
+        keyword = unicode(keyword).encode("utf8").strip()
 
         if len(keyword) == 0 or len(keyword.split()) > 1:
             QMessageBox.about(self,
@@ -47,25 +58,15 @@ class QuickFind(QDialog):
         for sent, words in self.data:
 
             if keyword in sent:
-                html += "<li>"
-                i = 0
 
-                for word, tag in words:
-                    if keyword == word:
-                        html += "<strong>%s</strong>(%s) " % (word, tag)
-                    else:
-                        html += "%s(%s) " % (word, tag)
-
-                    i += 1
-                html += "</li>"
-
+                html += self._template(keyword, sent, words)
                 num += 1
                 if num > 10:
                     break
 
         html += "</ul>"
 
-        html = html.decode("gb18030").encode("utf8")
+        html = html
         self.ui.exampleBrowser.setText(_translate("QuickFind", html, None))
         self.ui.queryBox.clear()
 
