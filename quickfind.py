@@ -30,12 +30,12 @@ class QuickFind(QDialog):
     def query(self):
 
         keyword = self.ui.queryBox.toPlainText()
-        keyword = unicode(keyword).encode("gb18030")
+        keyword = unicode(keyword).encode("gb18030").strip()
 
-        if len(keyword) == 0:
+        if len(keyword) == 0 or len(keyword.split()) > 1:
             QMessageBox.about(self,
-                    _translate("QuickFind", "³ö´íÁË", None),
-                    _translate("QuickFind", "²éÑ¯²»ÄÜÎª¿Õ", None))
+                    _translate("QuickFind", "å‡ºé”™äº†", None),
+                    _translate("QuickFind", "æŸ¥è¯¢ä¸èƒ½ä¸ºç©ºï¼Œä¹Ÿä¸èƒ½æœ‰ç©ºæ ¼å“¦", None))
             return
 
         cnt = 0
