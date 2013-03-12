@@ -2,6 +2,7 @@
 import sys
 from PyQt4.QtGui import QMessageBox, QApplication, QDialog
 from ui_quickfind import Ui_QuickFind
+from data import Data
 
 try:
     _encoding = QApplication.UnicodeUTF8
@@ -19,7 +20,8 @@ class QuickFind(QDialog):
         self.ui = Ui_QuickFind()
         self.ui.setupUi(self)
 
-        self.load(filename)
+        self.data = Data()
+        self.data.load(filename)
 
         # Connect up the buttons.
         self.ui.queryButton.clicked.connect(self.query)
@@ -40,7 +42,8 @@ class QuickFind(QDialog):
         html += "<ul>"
 
         num = 0
-        for line, words in self.corpus:
+        #for line, words in self.corpus:
+        for sent, words in self.data:
 
             if keyword in line:
                 html += "<li>"
@@ -80,6 +83,6 @@ class QuickFind(QDialog):
 
 if __name__=="__main__":
     app = QApplication(sys.argv)
-    w = QuickFind("corpus")
+    w = QuickFind("corpus.db")
     w.show()
     sys.exit(app.exec_())
