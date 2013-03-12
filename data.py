@@ -7,6 +7,8 @@ class Data(object):
 
     def __init__(self):
         self.i = -1
+        self.tags = {"v": [],
+                "c": [],}
 
     # load compressed data from filename
     def load(self, filename):

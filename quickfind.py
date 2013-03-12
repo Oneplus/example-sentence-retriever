@@ -27,61 +27,95 @@ class QuickFind(QDialog):
         # Connect up the buttons.
         self.ui.queryButton.clicked.connect(self.query)
 
-    def _template(self, keyword, sent, words):
+    def _snt_template(self, keyword, sent, words):
         html = "<li>"
-
+        
+        ukey = keyword.decode("utf8")
+        usent = sent.decode("utf8")
+        
+        a = usent.find(ukey)
+        b = a + len(ukey)
+        
+        # color [a, b)
+        i = 0
+        
         for word, tag in words:
-            if keyword == word:
-                html += "<strong>%s</strong>(%s) " % (word, tag)
+            
+            uword = word.decode("utf8")
+            j = i + len(uword)
+
+            wordstr = ""
+            
+            if a <= i and b >= j:
+                wordstr = "<span style=\"background-color:#ccc\">%s</span>" % word
+            elif a <= i and b > i and b < j:
+                word1 = usent[i: b].encode("utf8")
+                word2 = usent[b: j].encode("utf8")
+                wordstr = "<span style=\"background-color:#ccc\">%s</span>%s" % (word1, word2)
+            elif a > i and a < j and b >= j:
+                word1 = usent[i: a].encode("utf8")
+                word2 = usent[a: j].encode("utf8")
+                wordstr = "%s<span style=\"background-color:#ccc\">%s</span>" % (word1, word2)
+            elif a > i and b < j:
+                word1 = usent[i: a].encode("utf8")
+                word2 = usent[a: b].encode("utf8")
+                word3 = usent[b: j].encode("utf8")
+                wordstr = "%s<span style=\"background-color:#ccc\">%s</span>%s" % (word1, word2, word3)
             else:
-                html += "%s(%s) " % (word, tag)
+                wordstr = word
+            
+            if keyword == word:
+                html += "<strong>%s</strong>(%s) " % (wordstr, tag)
+            else:
+                html += "%s(%s) " % (wordstr, tag)
+
+            i = j
+            
         html += "</li>"
         return html
+        
+    def _tag_template(self, keytag, tags):
+        return "词性查询还在开发中"
 
     def query(self):
 
         keyword = self.ui.queryBox.toPlainText()
         keyword = unicode(keyword).encode("utf8").strip()
+        
+        html = ""
+        # if input is a tag, retrieve the tag examples
+        if keyword in self.data.tags:
+        
+            html = self._tag_template(keyword, self.data.tags)
+            
+        # else the input is a sentence segmentation
+        else:
+            if len(keyword) == 0 or len(keyword.split()) > 1:
+                QMessageBox.about(self,
+                        _translate("QuickFind", "出错了", None),
+                        _translate("QuickFind", "查询不能为空，也不能有空格哦", None))
+                return
 
-        if len(keyword) == 0 or len(keyword.split()) > 1:
-            QMessageBox.about(self,
-                    _translate("QuickFind", "出错了", None),
-                    _translate("QuickFind", "查询不能为空，也不能有空格哦", None))
-            return
+            cnt = 0
+            html = "<strong>%s</strong><hr />" % keyword
+            html += "<ul>"
 
-        cnt = 0
-        html = "<strong>%s</strong><hr />" % keyword
-        html += "<ul>"
+            num = 0
+            #for line, words in self.corpus:
+            for sent, words in self.data:
 
-        num = 0
-        #for line, words in self.corpus:
-        for sent, words in self.data:
+                if keyword in sent:
 
-            if keyword in sent:
-
-                html += self._template(keyword, sent, words)
-                num += 1
-                if num > 10:
+                    html += self._snt_template(keyword, sent, words)
+                    num += 1
+                
+                if num > 30:
                     break
 
-        html += "</ul>"
+            html += "</ul>"
 
-        html = html
         self.ui.exampleBrowser.setText(_translate("QuickFind", html, None))
         self.ui.queryBox.clear()
-
-    def load(self, filename):
-        try:
-            fp=open(filename, "r")
-        except:
-            print >> sys.stderr, "Failed to open file"
-            exit(1)
-
-        self.corpus = []
-        for line in fp:
-            words=[word.rsplit("_", 1) for word in line.strip().split()]
-            sentence = "".join(word[0] for word in words)
-            self.corpus.append((sentence, words))
 
 if __name__=="__main__":
     app = QApplication(sys.argv)
