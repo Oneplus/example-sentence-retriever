@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import sys
-import cPickle as pickle
+import marshal
 import gzip
 
 class Data(object):
@@ -24,7 +24,7 @@ class Data(object):
             buff += data
 
         try:
-            self.vocab, self.pos, self.corpus = pickle.loads(buff)
+            self.corpus = marshal.loads(buff)
         except IOError:
             print >> sys.stderr, "failed to open file."
             return
@@ -40,10 +40,9 @@ class Data(object):
             print >> sys.stderr, "Failed to open file."
             return
 
-        fpo.write(
-                pickle.dumps(
-                    (self.vocab, self.pos, self.corpus),
-                    True))
+        fpo.write(marshal.dumps(
+            self.corpus,
+            True))
 
         fpo.close()
 
@@ -55,47 +54,19 @@ class Data(object):
             print >> sys.stderr, "Failed to open file"
             return
 
-        vocabmap = {}
-        posmap   = {}
-
-        self.vocab  = []
-        self.pos    = []
         self.corpus = []
-
         for line in fp:
-            sentence = []
+            words=[word.rsplit("_", 1) for word in line.strip().split()]
+            sentence = "".join(word[0] for word in words)
+            self.corpus.append((sentence, words))
 
-            for wordstr, posstr in [
-                    word.rsplit("_") for word in line.strip().split()]:
-
-                if wordstr not in vocabmap:
-                    vocabmap[wordstr] = len(self.vocab)
-                    self.vocab.append(wordstr)
-
-                if posstr not in posmap:
-                    posmap[posstr] = len(self.pos)
-                    self.pos.append(posstr)
-
-                sentence.append((vocabmap[wordstr], posmap[posstr]))
-
-            self.corpus.append(sentence)
-
-        self.i = 0
         fp.close()
 
     # iteration method
     def __iter__(self):
+
         for sentence in self.corpus:
-
-            sentstr = ""
-            words = []
-
-            for word, pos in sentence:
-                sentstr += self.vocab[word]
-                words.append((
-                    self.vocab[word], self.pos[pos]))
-
-            yield sentstr, words
+            yield sentence
 
 def test():
     d = Data()
@@ -104,7 +75,9 @@ def test():
     d.load("corpus.small.db")
 
     for sent, words in d:
-        print sent, words
+        print sent
+        print " ".join(
+                ["%s(%s)" % (word[0], word[1]) for word in words])
 
 def main():
     d = Data()

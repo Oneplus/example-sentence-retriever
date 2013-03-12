@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import sys
+import time
 from PyQt4.QtGui import QMessageBox, QApplication, QDialog
 from ui_quickfind import Ui_QuickFind
 from data import Data
@@ -45,7 +46,7 @@ class QuickFind(QDialog):
         #for line, words in self.corpus:
         for sent, words in self.data:
 
-            if keyword in line:
+            if keyword in sent:
                 html += "<li>"
                 i = 0
 
