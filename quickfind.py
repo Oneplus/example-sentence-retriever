@@ -74,29 +74,43 @@ class QuickFind(QDialog):
         html += "</li>"
         return html
         
-    def _tag_template(self, keytag, tags):
-        return "词性查询还在开发中"
+    def _tag_template(self, keytag, words):
+        html = "<li>"
+        for word, tag in words:
+            if tag == keytag:
+                wordstr = "%s(<span style=\"background-color:#ccc;font-weight:600\">%s</span>) " % (word, tag)
+            else:
+                wordstr = "%s(%s) " % (word, tag)
+            
+            html += wordstr
+            
+        html += "</li>"
+        return html
 
     def query(self):
 
         keyword = self.ui.queryBox.toPlainText()
         keyword = unicode(keyword).encode("utf8").strip()
         
+        if len(keyword) == 0 or len(keyword.split()) > 1:
+            QMessageBox.about(self,
+                    _translate("QuickFind", "出错了", None),
+                    _translate("QuickFind", "查询不能为空，也不能有空格哦", None))
+            return
+        
         html = ""
         # if input is a tag, retrieve the tag examples
         if keyword in self.data.tags:
-        
-            html = self._tag_template(keyword, self.data.tags)
+            html = "<strong>%s</strong><hr />" % keyword
+            html += "<ul>"
+
+            for sent, words in self.data.tags[keyword]:
+                html += self._tag_template(keyword, words)
+                
+            html += "</ul>"
             
         # else the input is a sentence segmentation
         else:
-            if len(keyword) == 0 or len(keyword.split()) > 1:
-                QMessageBox.about(self,
-                        _translate("QuickFind", "出错了", None),
-                        _translate("QuickFind", "查询不能为空，也不能有空格哦", None))
-                return
-
-            cnt = 0
             html = "<strong>%s</strong><hr />" % keyword
             html += "<ul>"
 

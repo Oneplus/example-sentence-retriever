@@ -3,6 +3,12 @@
 
 [![Build Status](https://api.travis-ci.org/Oneplus/example-sentence-retriever.png)](https://api.travis-ci.org/Oneplus/example-sentence-retriever)
 
+### 新功能
+
+新版本可以查词性了
+
+### 截图
+
 ![很难看的截图](https://raw.github.com/Oneplus/example-sentence-retriever/master/assets/figure.png)
 
 这是一个用来帮助标注者标注数据的一个小工具。在标注者拿不准某些句子片段应该如何划分或者如何标词性时，这个小助手可以提供一定的参考。

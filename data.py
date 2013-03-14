@@ -7,8 +7,7 @@ class Data(object):
 
     def __init__(self):
         self.i = -1
-        self.tags = {"v": [],
-                "c": [],}
+        self.tags = {}
 
     # load compressed data from filename
     def load(self, filename):
@@ -26,7 +25,7 @@ class Data(object):
             buff += data
 
         try:
-            self.corpus = marshal.loads(buff)
+            self.corpus, self.tags = marshal.loads(buff)
         except IOError:
             print >> sys.stderr, "failed to open file."
             return
@@ -43,7 +42,8 @@ class Data(object):
             return
 
         fpo.write(marshal.dumps(
-            self.corpus,
+            (self.corpus,
+            self.tags),
             True))
 
         fpo.close()
@@ -61,6 +61,18 @@ class Data(object):
             words=[word.rsplit("_", 1) for word in line.strip().split()]
             sentence = "".join(word[0] for word in words)
             self.corpus.append((sentence, words))
+            
+            for word, tag in words:
+                if tag not in self.tags:
+                    self.tags[tag] = []
+                    
+                if len(self.tags[tag]) < 30:
+                    f = True
+                    for sent, _ in self.tags[tag]:
+                        if sent == sentence:
+                            f = False
+                    if f:
+                        self.tags[tag].append((sentence, words))
 
         fp.close()
 
