@@ -1,8 +1,6 @@
 例句查找小助手
 =============
 
-[![Build Status](https://api.travis-ci.org/Oneplus/example-sentence-retriever.png)](https://api.travis-ci.org/Oneplus/example-sentence-retriever)
-
 ### 更新历史
 
 * 2013-3-15 支持了回车触发
