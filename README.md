@@ -3,9 +3,10 @@
 
 [![Build Status](https://api.travis-ci.org/Oneplus/example-sentence-retriever.png)](https://api.travis-ci.org/Oneplus/example-sentence-retriever)
 
-### 新功能
+### 更新历史
 
-新版本可以查词性了
+* 2013-3-15 支持了回车触发
+* 2013-3-14 新版本可以查词性了
 
 ### 截图
 
