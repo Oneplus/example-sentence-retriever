@@ -2,6 +2,7 @@
 import sys
 import time
 from PyQt4.QtGui import QMessageBox, QApplication, QDialog
+from PyQt4.QtCore import QEvent, Qt
 from ui_quickfind import Ui_QuickFind
 from data import Data
 
@@ -26,6 +27,15 @@ class QuickFind(QDialog):
 
         # Connect up the buttons.
         self.ui.queryButton.clicked.connect(self.query)
+        self.ui.queryBox.installEventFilter(self)
+
+    def eventFilter(self, obj, ev): 
+        if ev.type() == QEvent.KeyPress and ev.key() == Qt.Key_Return:
+            self.query()
+            return True 
+ 
+        QDialog.eventFilter(self,  obj,  ev)
+        return False 
 
     def _snt_template(self, keyword, sent, words):
         html = "<li>"
